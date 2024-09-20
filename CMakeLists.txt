@@ -21,6 +21,3 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 
 # 定义动态库，NativeEncrypt 是 dll 文件名
 add_library(NativeEncrypt SHARED src/CMakeEncrypt.cpp)
-
-# 设置输出名称，去掉 lib 前缀
-set_target_properties(NativeEncrypt PROPERTIES OUTPUT_NAME "NativeEncrypt")
