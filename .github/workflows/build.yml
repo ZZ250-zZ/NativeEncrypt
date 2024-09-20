@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - name: Checkout source code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install CMake
       run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' --yes
@@ -36,7 +36,7 @@ jobs:
 
     steps:
     - name: Checkout source code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install -y build-essential cmake
