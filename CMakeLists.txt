@@ -1,6 +1,6 @@
 ﻿# CMakeList.txt: 顶层 CMake 项目文件，在此处执行全局配置
 # 并包含子项目。
-#
+# 指定构建该项目所需的CMake最低版本
 cmake_minimum_required (VERSION 3.8)
 
 project ("CMakeEncrypt")
@@ -18,6 +18,9 @@ include_directories(${PLATFORM_INCLUDE_DIR})
 # 导入公共 头文件
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/src)
+
+# 设置静态链接选项
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
 
 # 定义动态库，NativeEncrypt 是 dll 文件名
 add_library(NativeEncrypt SHARED src/CMakeEncrypt.cpp)
