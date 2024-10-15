@@ -20,11 +20,25 @@ jobs:
     - name: Install CMake
       run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' --yes
 
-    - name: Configure CMake
-      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        cd ..
+        echo "VCPKG_ROOT=$(pwd)\vcpkg" >> $env:GITHUB_ENV
 
-    - name: Build with CMake
-      run: cmake --build build --config Release
+    - name: Install libcurl
+      run: |
+        $vcpkgRoot = $env:VCPKG_ROOT
+        cd $vcpkgRoot
+        .\vcpkg install --triplet x64-windows curl:7.79.1
+        cd ..
+
+    - name: Configure CMake and Build with CMake
+      run: |
+	    cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$(pwd)\vcpkg\scripts\buildsystems\vcpkg.cmake
+        cmake --build build --config Release
 
     - name: Upload DLL
       uses: actions/upload-artifact@v4
