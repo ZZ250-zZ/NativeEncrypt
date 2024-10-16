@@ -1,0 +1,84 @@
+name: Build DLL and SO
+
+on:
+# 手动触发
+  workflow_dispatch:
+# push 或者 合并到 master 时触发
+#  push:
+#    branches:
+#      - main
+#  pull_request:
+#    branches:
+#      - main
+
+jobs:
+  build-windows:
+    runs-on: windows-2019
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Install CMake
+      run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' --yes
+
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.bat
+        cd ..
+        echo "VCPKG_ROOT=$(pwd)/vcpkg" >> $env:GITHUB_ENV
+
+    - name: Install libcurl
+      run: |
+        cd ${{ env.VCPKG_ROOT }}
+        ./vcpkg install --triplet x64-windows curl:7.79.1
+        cd ..
+
+    - name: Configure CMake and Build with CMake
+      run: |
+	    cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+	    #cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+        cmake --build build --config Release
+
+    - name: Upload DLL
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-dll
+        path: build/Release/*.dll
+
+  build-linux:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential cmake libstdc++6
+
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
+        cd ..
+        echo "VCPKG_ROOT=$(pwd)/vcpkg" >> $GITHUB_ENV
+
+    - name: Install libcurl
+      run: |
+        cd ${{ env.VCPKG_ROOT }}
+        ./vcpkg install --triplet x64-linux curl:7.79.1
+        cd ..
+
+    - name: Configure CMake and Build with CMake
+      run: |
+	    cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+		cmake --build build --config Release
+
+    - name: Upload SO
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-so
+        path: build/*.so
