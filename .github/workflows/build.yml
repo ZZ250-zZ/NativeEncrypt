@@ -21,11 +21,11 @@ jobs:
 
     - name: Install CMake
       run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' --yes
-	  
+
     - name: Configure CMake
       run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         echo "VCPKG_ROOT=$(pwd)\vcpkg" >> $env:GITHUB_ENV
-		
+
     - name: Build with CMake
       run: cmake --build build --config Release
 
