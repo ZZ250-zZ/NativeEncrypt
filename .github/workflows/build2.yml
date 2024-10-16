@@ -1,4 +1,4 @@
-name: Build DLL and SO
+name: Build DLL and SO222
 
 on:
 # 手动触发
