@@ -33,7 +33,7 @@ jobs:
     - name: Install libcurl
       run: |
         cd ${{ env.VCPKG_ROOT }}
-        ./vcpkg install --triplet x64-windows curl:7.79.1
+        ./vcpkg install curl:x64-windows
         cd ..
 
     - name: Configure CMake and Build with CMake
@@ -68,7 +68,7 @@ jobs:
     - name: Install libcurl
       run: |
         cd ${{ env.VCPKG_ROOT }}
-        ./vcpkg install --triplet x64-linux curl:7.79.1
+        ./vcpkg install --triplet x64-linux curl
         cd ..
 
     - name: Configure CMake and Build with CMake
