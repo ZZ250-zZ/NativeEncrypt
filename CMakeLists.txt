@@ -32,4 +32,4 @@ find_package(CURL CONFIG REQUIRED)
 add_library(NativeEncrypt SHARED src/CMakeEncrypt.cpp)
 
 # 链接 libcurl
-target_link_libraries(your_dll PRIVATE CURL::libcurl)
+target_link_libraries(NativeEncrypt PRIVATE CURL::libcurl)
