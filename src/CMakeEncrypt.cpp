@@ -2,6 +2,7 @@
 //
 
 #include <vector>
+#include <string>
 #include "com_me_study_javaCore_jni_NativeEncryptUtils.h"
 #include <curl/curl.h>
 
