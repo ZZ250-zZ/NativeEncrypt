@@ -12,7 +12,7 @@ elseif(UNIX AND NOT APPLE)
     set(PLATFORM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/linux")
 
 	# 设置静态链接选项
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ libstdc")
 else()
     message(FATAL_ERROR "Unsupported platform")
 endif()
@@ -31,5 +31,7 @@ find_package(CURL CONFIG REQUIRED)
 # 定义动态库，NativeEncrypt 是 dll 文件名
 add_library(NativeEncrypt SHARED src/CMakeEncrypt.cpp)
 
+set(CURL_DIR "${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-windows/share/curl")
+set(ZLIB_ROOT "${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-windows")
 # 链接 libcurl
 target_link_libraries(NativeEncrypt PRIVATE CURL::libcurl)
