@@ -42,7 +42,7 @@ jobs:
         cmake --build build --config Release
 
     - name: Setup Debug Session
-      uses: csexton/debugger-action@master
+      uses: mxschmitt/action-tmate@v3
 
     - name: Upload DLL
       uses: actions/upload-artifact@v4
