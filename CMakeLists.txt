@@ -12,7 +12,7 @@ elseif(UNIX AND NOT APPLE)
     set(PLATFORM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/linux")
 
 	# 设置静态链接选项
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ libstdc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static-libc")
 else()
     message(FATAL_ERROR "Unsupported platform")
 endif()
