@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-20.04z
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout source code
