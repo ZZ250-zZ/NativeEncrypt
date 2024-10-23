@@ -15,6 +15,10 @@ elseif(UNIX AND NOT APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
     # 禁用新的 ABI（Application Binary Interface）来提高兼容性
     add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0)
+    
+    # 指定的 GCC 和 G++
+    set(CMAKE_C_COMPILER "/usr/local/gcc-4.8.5/bin/gcc")
+    set(CMAKE_CXX_COMPILER "/usr/local/gcc-4.8.5/bin/g++")
 else()
     message(FATAL_ERROR "Unsupported platform")
 endif()
@@ -33,7 +37,5 @@ find_package(CURL CONFIG REQUIRED)
 # 定义动态库，NativeEncrypt 是 dll 文件名
 add_library(NativeEncrypt SHARED src/CMakeEncrypt.cpp)
 
-set(CURL_DIR "${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-windows/share/curl")
-set(ZLIB_ROOT "${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-windows")
 # 链接 libcurl
 target_link_libraries(NativeEncrypt PRIVATE CURL::libcurl)

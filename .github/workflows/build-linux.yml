@@ -1,8 +1,14 @@
-name: Build SO
+name: Build Linux SO
 
 on:
 # 手动触发
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 # push 或者 合并到 master 时触发
 #  push:
 #    branches:
@@ -13,14 +19,14 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04z
 
     steps:
     - name: Checkout source code
       uses: actions/checkout@v4
 
     - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y build-essential cmake libstdc++6
+      run: sudo apt-get update && sudo apt-get install -y build-essential cmake libstdc++6 gcc-4.8 g++-4.8
 
     - name: Install vcpkg
       run: |
@@ -40,6 +46,10 @@ jobs:
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
         cmake --build build --config Release
+
+    - name: Setup Debug Session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
 
     - name: Upload SO
       uses: actions/upload-artifact@v4
