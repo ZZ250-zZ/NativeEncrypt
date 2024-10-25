@@ -6,14 +6,15 @@
 #include "com_me_study_javaCore_jni_NativeEncryptUtils.h"
 #include <curl/curl.h>
 #include <fstream>
-#include <limits.h> // PATH_MAX
 #include <stdexcept>
 
 #if defined(_WIN32) || defined(_WIN64)
     #include <direct.h>  // Windows下使用_getcwd
     #define getcwd _getcwd
+    #define PATH_MAX _MAX_PATH
 #else
     #include <unistd.h>  // POSIX API
+    #include <limits.h> // PATH_MAX
 #endif
 
 using namespace std;
