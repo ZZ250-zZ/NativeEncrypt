@@ -38,7 +38,7 @@ std::string readFile(const std::string& filename) {
     // 打开并读取指定文件的内容
     std::ifstream file(filename);
     if (!file) {
-        throw std::runtime_error("Could not open " + filename);
+        throw std::runtime_error(u8"文件不存在：" + string(currentPath) + "/" + filename);
     }
 
     std::string line;
