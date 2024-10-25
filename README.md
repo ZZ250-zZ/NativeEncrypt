@@ -7,3 +7,5 @@ so 库需要手动编译。
 
 固定从这里请求内容 https://gitee.com/uahioacnao/jni-key/raw/master/*.txt
 * 可以通过java当前路径下的 key.conf 配置
+
+windows 目前没有解决 cmd窗口乱码问题
