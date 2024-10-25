@@ -7,6 +7,8 @@
 #include <curl/curl.h>
 #include <fstream>
 #include <stdexcept>
+#include <sstream>  // for std::istringstream
+#include <iomanip>  // for std::get_time
 
 #if defined(_WIN32) || defined(_WIN64)
     #include <direct.h>  // Windows下使用_getcwd
