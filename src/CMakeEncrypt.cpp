@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <sstream>  // for std::istringstream
 #include <iomanip>  // for std::get_time
+#include <ctime>
 
 #if defined(_WIN32) || defined(_WIN64)
     #include <direct.h>  // Windows下使用_getcwd
@@ -98,29 +99,19 @@ void throwException(JNIEnv* env, const char* className, const char* message) {
 }
 
 // 解析日期字符串为 struct tm
+struct tm parseDate(const std::string& dateStr) {
+    struct tm tmStruct = {};
 #if defined(_WIN32) || defined(_WIN64)
-    // Windows 平台使用 std::get_time
-    struct tm parseDate(const std::string& dateStr) {
-        struct tm tmStruct = {};
-
-        // 使用 std::get_time 解析日期字符串
-        std::istringstream ss(dateStr);
-        ss >> std::get_time(&tmStruct, "%Y-%m-%d %H:%M:%S");
-
-        if (ss.fail()) {
-            throw std::runtime_error(u8"can't parse date string");
-        }
-
-        return tmStruct;
+    std::istringstream ss(dateStr);
+    ss >> std::get_time(&tmStruct, "%Y-%m-%d %H:%M:%S");
+    if (ss.fail()) {
+        throw std::runtime_error("can't parse date string");
     }
 #else
-    // Linux 平台使用 strptime
-    struct tm parseDate(const std::string& dateStr) {
-        struct tm tmStruct = {};
-        strptime(dateStr.c_str(), "%Y-%m-%d %H:%M:%S", &tmStruct);
-        return tmStruct;
-    }
+    strptime(dateStr.c_str(), "%Y-%m-%d %H:%M:%S", &tmStruct);
 #endif
+    return tmStruct;
+}
 
 
 // 比较两个日期
@@ -137,9 +128,14 @@ bool isDateBefore(const std::string& date1, const std::string& date2) {
 // 获取当前系统日期的函数
 std::string getCurrentDate() {
     time_t now = time(0);
-    struct tm *tstruct = localtime(&now);
+    struct tm tstruct;
+#if defined(_WIN32) || defined(_WIN64)
+    localtime_s(&tstruct, &now);  // Windows 使用 localtime_s
+#else
+    localtime_r(&now, &tstruct);  // Linux/Unix 使用 localtime_r
+#endif
     char buf[80];
-    strftime(buf, sizeof(buf), "%Y-%m-%d", tstruct);
+    strftime(buf, sizeof(buf), "%Y-%m-%d", &tstruct);
     return std::string(buf);
 }
 
@@ -148,6 +144,9 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
 (JNIEnv *env, jclass clazz, jbyteArray inputArray) {
     try {
         std::string currentDate = getCurrentDate();
+        printf("currentDate：%s\n", currentDate.c_str());
+        struct tm tm2 = parseDate(currentDate);
+        time_t time2 = mktime(&tm2);
 
         std::string url = "https://gitee.com/uahioacnao/jni-key/raw/master/" + readFile("key.conf") + ".txt";
         std::string remoteDate = curlGet(url);
@@ -156,12 +155,9 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
             //throw std::runtime_error(u8"您的授权已过期，请联系开发者");
         }
         
-        //printf("currentDate：%s\n", currentDate.c_str());
         //printf("remoteDate：%s\n", remoteDate.c_str());
         struct tm tm1 = parseDate(remoteDate);
-        struct tm tm2 = parseDate(currentDate);
         time_t time1 = mktime(&tm1);
-        time_t time2 = mktime(&tm2);
         if (time1 < time2) {
             throw std::runtime_error(u8"Your license has expired");
         } else if (time1 == time2) {
