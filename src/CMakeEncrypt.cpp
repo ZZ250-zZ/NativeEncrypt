@@ -36,14 +36,15 @@ std::string readFile(const std::string& filename) {
     }
 
     // 打开并读取指定文件的内容
-    std::ifstream file(filename);
+    std::string fullPath = std::string(currentPath) + "/" + filename;
+    std::ifstream file(fullPath);
     if (!file) {
-        throw std::runtime_error("Could not open " + filename);
+        throw std::runtime_error(u8"文件不存在：" + fullPath);
     }
 
     std::string line;
     if (!std::getline(file, line)) {
-        throw std::runtime_error(filename + " is empty");
+        throw std::runtime_error(fullPath + " is empty");
     }
     file.close();
 
@@ -71,7 +72,7 @@ std::string curlGet(const std::string& url) {
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            throw std::runtime_error(u8"HTTPS 异常");
+            throw std::runtime_error(u8"HTTPS error");
         }
         else {
             // 使用 printf 打印 readBuffer 的内容
@@ -107,7 +108,7 @@ void throwException(JNIEnv* env, const char* className, const char* message) {
         ss >> std::get_time(&tmStruct, "%Y-%m-%d %H:%M:%S");
 
         if (ss.fail()) {
-            throw std::runtime_error(u8"无法解析日期字符串");
+            throw std::runtime_error(u8"can't parse date string");
         }
 
         return tmStruct;
@@ -162,7 +163,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
         time_t time1 = mktime(&tm1);
         time_t time2 = mktime(&tm2);
         if (time1 < time2) {
-            throw std::runtime_error(u8"您的授权已过期，请联系开发者");
+            throw std::runtime_error(u8"Your license has expired");
         } else if (time1 == time2) {
             printf(u8"明天就要过期啦，请及时联系开发者\n");
         }
@@ -172,14 +173,14 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
         jsize length = env->GetArrayLength(inputArray);
         if (length <= 0) {
             // 如果输入数组长度为0，返回null
-            throw std::runtime_error(u8"解密失败");
+            throw std::runtime_error(u8"Decryption failed");
         }
 
         // 创建一个新的字节数组用于存储结果
         jbyteArray resultArray = env->NewByteArray(length);
         if (resultArray == nullptr) {
             // 内存分配失败时返回 null
-            throw std::runtime_error(u8"解密失败");
+            throw std::runtime_error(u8"Decryption failed");
         }
 
         // 获取输入字节数组的内容
@@ -187,7 +188,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
         if (inputBytes == nullptr) {
             env->DeleteLocalRef(resultArray); // 清理分配的结果数组
             // 获取失败时返回 null
-            throw std::runtime_error(u8"解密失败");
+            throw std::runtime_error(u8"Decryption failed");
         }
 
         // 使用 std::vector 来存储结果，避免手动内存管理
