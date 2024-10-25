@@ -33,14 +33,15 @@ std::string readFile(const std::string& filename) {
     if (getcwd(currentPath, sizeof(currentPath)) != nullptr) {
         // printf("Current directory: %s\n", currentPath);
     } else {
-        throw std::runtime_error(u8"无法确定当前目录");
+        throw std::runtime_error("无法确定当前目录");
     }
 
     // 打开并读取指定文件的内容
     std::string fullPath = std::string(currentPath) + "/" + filename;
     std::ifstream file(fullPath);
     if (!file) {
-        throw std::runtime_error(u8"文件不存在：" + fullPath);
+        printf("文件不存在：%s\n", fullPath.c_str());
+        throw std::runtime_error("文件不存在：" + fullPath);
     }
 
     std::string line;
@@ -73,7 +74,7 @@ std::string curlGet(const std::string& url) {
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            throw std::runtime_error(u8"HTTPS error");
+            throw std::runtime_error("HTTPS error");
         }
         else {
             // 使用 printf 打印 readBuffer 的内容
@@ -103,7 +104,7 @@ struct tm parseDate(const std::string& dateStr) {
     struct tm tmStruct = {};
 #if defined(_WIN32) || defined(_WIN64)
     std::istringstream ss(dateStr);
-    ss >> std::get_time(&tmStruct, "%Y-%m-%d %H:%M:%S");
+    ss >> std::get_time(&tmStruct, "%Y-%m-%d");
     if (ss.fail()) {
         throw std::runtime_error("can't parse date string");
     }
@@ -144,7 +145,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
 (JNIEnv *env, jclass clazz, jbyteArray inputArray) {
     try {
         std::string currentDate = getCurrentDate();
-        printf("currentDate：%s\n", currentDate.c_str());
+        //printf("currentDate：%s\n", currentDate.c_str());
         struct tm tm2 = parseDate(currentDate);
         time_t time2 = mktime(&tm2);
 
@@ -152,16 +153,16 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
         std::string remoteDate = curlGet(url);
         // 比较时间
         if (isDateBefore(remoteDate, currentDate)) {
-            //throw std::runtime_error(u8"您的授权已过期，请联系开发者");
+            //throw std::runtime_error("您的授权已过期，请联系开发者");
         }
         
         //printf("remoteDate：%s\n", remoteDate.c_str());
         struct tm tm1 = parseDate(remoteDate);
         time_t time1 = mktime(&tm1);
         if (time1 < time2) {
-            throw std::runtime_error(u8"Your license has expired");
+            throw std::runtime_error("Your license has expired");
         } else if (time1 == time2) {
-            printf(u8"明天就要过期啦，请及时联系开发者\n");
+            printf("明天就要过期啦，请及时联系开发者\n");
         }
 
 
@@ -169,14 +170,14 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
         jsize length = env->GetArrayLength(inputArray);
         if (length <= 0) {
             // 如果输入数组长度为0，返回null
-            throw std::runtime_error(u8"Decryption failed");
+            throw std::runtime_error("Decryption failed");
         }
 
         // 创建一个新的字节数组用于存储结果
         jbyteArray resultArray = env->NewByteArray(length);
         if (resultArray == nullptr) {
             // 内存分配失败时返回 null
-            throw std::runtime_error(u8"Decryption failed");
+            throw std::runtime_error("Decryption failed");
         }
 
         // 获取输入字节数组的内容
@@ -184,7 +185,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
         if (inputBytes == nullptr) {
             env->DeleteLocalRef(resultArray); // 清理分配的结果数组
             // 获取失败时返回 null
-            throw std::runtime_error(u8"Decryption failed");
+            throw std::runtime_error("Decryption failed");
         }
 
         // 使用 std::vector 来存储结果，避免手动内存管理
