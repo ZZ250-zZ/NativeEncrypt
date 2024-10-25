@@ -1,9 +1,11 @@
-﻿# CMakeList.txt: 顶层 CMake 项目文件，在此处执行全局配置
+# CMakeList.txt: 顶层 CMake 项目文件，在此处执行全局配置
 # 并包含子项目。
 # 指定构建该项目所需的CMake最低版本
 cmake_minimum_required (VERSION 3.8)
-
 project ("NativeEncrypt")
+
+# 设置源文件编码为 UTF-8
+set_source_files_properties(CMakeEncrypt.cpp PROPERTIES CHARACTER_SET UTF-8)
 
 # 根据平台设置 PLATFORM_INCLUDE_DIR 变量，然后使用 include_directories 命令添加头文件
 if(WIN32)
