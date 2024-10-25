@@ -127,13 +127,15 @@ JNIEXPORT jbyteArray JNICALL Java_com_me_study_javaCore_jni_NativeEncryptUtils_d
             //throw std::runtime_error("您的授权已过期，请联系开发者");
         }
         
+        //printf("currentDate：%s\n", currentDate.c_str());
+        //printf("remoteDate：%s\n", remoteDate.c_str());
         struct tm tm1 = parseDate(remoteDate);
         struct tm tm2 = parseDate(currentDate);
         time_t time1 = mktime(&tm1);
         time_t time2 = mktime(&tm2);
         if (time1 < time2) {
             throw std::runtime_error("您的授权已过期，请联系开发者");
-        } else if (time1 = time2) {
+        } else if (time1 == time2) {
             printf("明天就要过期啦，请及时联系开发者\n");
         }
 
