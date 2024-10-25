@@ -6,9 +6,15 @@
 #include "com_me_study_javaCore_jni_NativeEncryptUtils.h"
 #include <curl/curl.h>
 #include <fstream>
-#include <unistd.h>  // POSIX API
 #include <limits.h> // PATH_MAX
 #include <stdexcept>
+
+#if defined(_WIN32) || defined(_WIN64)
+    #include <direct.h>  // Windows下使用_getcwd
+    #define getcwd _getcwd
+#else
+    #include <unistd.h>  // POSIX API
+#endif
 
 using namespace std;
 
@@ -23,18 +29,18 @@ std::string readFile(const std::string& filename) {
     if (getcwd(currentPath, sizeof(currentPath)) != nullptr) {
         // printf("Current directory: %s\n", currentPath);
     } else {
-        throw std::runtime_error("Could not open key.conf");
+        throw std::runtime_error("无法确定当前目录");
     }
 
     // 打开并读取指定文件的内容
     std::ifstream file(filename);
     if (!file) {
-        throw std::runtime_error("Could not open key.conf");
+        throw std::runtime_error("Could not open " + filename);
     }
 
     std::string line;
     if (!std::getline(file, line)) {
-        throw std::runtime_error("key.conf is empty");
+        throw std::runtime_error(filename + " is empty");
     }
     file.close();
 
