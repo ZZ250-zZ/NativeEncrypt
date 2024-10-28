@@ -26,6 +26,57 @@ using namespace std;
 // 定义常量值用于按位异或
 const jbyte XOR_VALUE = 19;
 
+#ifdef _WIN32
+// 将UTF-8字符串转换为GBK字符串
+std::string utf8ToGbk(const std::string& utf8Str) {
+	// 计算需要的缓冲区大小以存储宽字符
+	int wideCharSize = MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), -1, nullptr, 0);
+	if (wideCharSize == 0) {
+		return ""; // 转换失败
+	}
+
+	// 分配宽字符缓冲区
+	std::wstring wideStr(wideCharSize, 0);
+	MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), -1, &wideStr[0], wideCharSize);
+
+	// 计算需要的缓冲区大小以存储GBK字符
+	int gbkSize = WideCharToMultiByte(CP_ACP, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	if (gbkSize == 0) {
+		return ""; // 转换失败
+	}
+
+	// 分配GBK字符缓冲区
+	std::string gbkStr(gbkSize, 0);
+	WideCharToMultiByte(CP_ACP, 0, wideStr.c_str(), -1, &gbkStr[0], gbkSize, nullptr, nullptr);
+
+	return gbkStr;
+}
+#endif
+
+// 跨平台的 printf 方法，windows 输出 GBK，Linux直接输出
+void crossPlatformPrintf(const char* format, ...) {
+	va_list args;
+	va_start(args, format);
+
+#ifdef _WIN32
+	// Windows平台处理：将格式化后的UTF-8字符串转换为GBK
+	int size = _vscprintf(format, args) + 1;  // 获取格式化字符串所需的大小
+	std::string utf8Str(size, '\0');
+	vsnprintf(&utf8Str[0], size, format, args);
+
+	// 转换为GBK编码
+	std::string gbkStr = utf8ToGbk(utf8Str);
+
+	// 使用printf输出GBK编码的字符串
+	printf("%s", gbkStr.c_str());
+#else
+	// 非Windows平台处理：直接输出UTF-8
+	vprintf(format, args);
+#endif
+
+	va_end(args);
+}
+
 // 读取文件首行内容
 std::string readFile(const std::string& filename) {
     // 获取当前目录的完整路径
